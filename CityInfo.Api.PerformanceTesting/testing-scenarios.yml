@@ -1,0 +1,30 @@
+config:
+    target: "https://localhost:7197/api"   
+    phases:
+      - duration: 10
+        arrivalRate: 2
+    before:
+      flow:
+        - log: "Get auth token"
+        - post:
+            url: "/authentication/authenticate"
+            json:
+              username: "myUsername"
+              password: "myPassword"
+            capture:
+              - json: $.id_token
+                as: token
+scenarios:
+  - name: "Obtener ciudades"
+    flow:
+    - get:
+        url: "/cities"
+        headers:
+          authorization: "Bearer {{ token }}"
+  - name: "Grabar punto de interes"
+    flow:
+      - post:
+          url: /cities/3/pointsofinterest       
+          json:
+              name: "Rosario"
+              description: "Ciudad con humo"
